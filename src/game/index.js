@@ -1,22 +1,157 @@
-const popupConnectServer = new PopupConnectServer();
-const state = new Proxy(
-  { connectedServer: false },
-  {
-    set(target, key, value) {
-      if (key === "connectedServer") {
-        value ? popupConnectServer.close() : popupConnectServer.show()
-      }
-      target[key] = value;
-      return true;
-    },
-  }
-);
+const socket = io("http://localhost:3000");
 
-const socket = io("http://localhost:1995");
-socket.on("connect", () => {
-  state.connectedServer = true;
+function getOrCreateToken() {
+  const urlParams = new URLSearchParams(window.location.search);
+  let token = urlParams.get("token");
+  if (!token) {
+    token = Math.floor(100000 + Math.random() * 900000);
+    window.location.search = `?token=${token}`;
+  }
+  return token;
+}
+
+const token = getOrCreateToken();
+
+// DOM elements
+const boardEl = document.getElementById("board");
+const statusEl = document.getElementById("status");
+const playerInfoEl = document.getElementById("playerInfo");
+const timerEl = document.getElementById("timer");
+const passBtn = document.getElementById("passBtn");
+const resetBtn = document.getElementById("resetBtn");
+
+let mySymbol = null;
+let currentPlayer = null;
+let lastMoves = { X: null, O: null };
+let timer = 60;
+let timerInterval;
+
+function initBoard() {
+  boardEl.innerHTML = "";
+  boardEl.style.display = "grid";
+  boardEl.style.gridTemplateColumns = "repeat(18, 1fr)";
+  for (let r = 0; r < 18; r++) {
+    for (let c = 0; c < 18; c++) {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      cell.dataset.row = r;
+      cell.dataset.col = c;
+      cell.addEventListener("click", () => makeMove(r, c));
+      boardEl.appendChild(cell);
+    }
+  }
+}
+
+// Reset timer
+function resetTimer() {
+  clearInterval(timerInterval);
+  timer = 60;
+  timerEl.textContent = `⏳ ${timer}`;
+  timerInterval = setInterval(() => {
+    timer--;
+    timerEl.textContent = `⏳ ${timer}`;
+    if (timer <= 0) {
+      clearInterval(timerInterval);
+      passTurn();
+    }
+  }, 1000);
+}
+
+// Highlight bước cuối cùng
+function highlightLastMove(symbol, row, col) {
+  if (lastMoves[symbol]) {
+    const prev = document.querySelector(
+      `.cell[data-row="${lastMoves[symbol].row}"][data-col="${lastMoves[symbol].col}"]`
+    );
+    if (prev) prev.classList.remove("last-x", "last-o");
+  }
+  const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+  if (cell) {
+    cell.classList.add(symbol === "X" ? "last-x" : "last-o");
+    lastMoves[symbol] = { row, col };
+  }
+}
+
+// Socket events
+socket.emit("joinRoom", token);
+
+socket.on("joined", (data) => {
+  mySymbol = data.symbol;
+  playerInfoEl.textContent = `You are Player ${mySymbol}`;
 });
-socket.on("connect_error", (err) => {
-  state.connectedServer = false;
+
+socket.on("waiting", (msg) => {
+  statusEl.textContent = msg;
 });
-socket.on("disconnect", (reason) => {});
+
+socket.on("redirectHome", () => {
+  window.location.href = "/src/home/index.html";
+});
+
+// Khi server reset trận đấu
+socket.on("resetGame", ({ currentPlayer: cp }) => {
+  initBoard();
+  lastMoves = { X: null, O: null };
+  currentPlayer = cp;
+  statusEl.textContent = `Game started! Turn: ${currentPlayer}`;
+  boardEl.dataset.gameOver = "false";
+  resetTimer();
+});
+
+// Khi có nước đi mới
+socket.on("updateBoard", ({ row, col, symbol, currentPlayer: cp }) => {
+  const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+  if (cell) cell.textContent = symbol;
+
+  highlightLastMove(symbol, row, col);
+  currentPlayer = cp;
+  statusEl.textContent = `Turn: ${currentPlayer}`;
+  resetTimer();
+});
+
+socket.on("gameOver", ({ winner, cells }) => {
+  statusEl.textContent = `${winner} Wins! 🎉`;
+  clearInterval(timerInterval);
+
+  // highlight ô thắng
+  cells.forEach(({ row, col }) => {
+    const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+    if (cell) cell.classList.add("win-cell");
+  });
+
+  // khóa bàn cờ
+  boardEl.dataset.gameOver = "true";
+});
+
+// Khi đối thủ thoát
+socket.on("opponentLeft", () => {
+  statusEl.textContent = "❌ Opponent left. Game ended.";
+  clearInterval(timerInterval);
+});
+
+// Gửi nước đi
+function makeMove(row, col) {
+  if (boardEl.dataset.gameOver === "true") return; // khóa bàn
+  if (currentPlayer !== mySymbol) return;
+  const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+  if (cell.textContent) return;
+  socket.emit("makeMove", { row, col });
+}
+
+// Bỏ lượt
+function passTurn() {
+  if (currentPlayer === mySymbol) {
+    socket.emit("passTurn");
+  }
+}
+
+// Reset game
+function resetGame() {
+  socket.emit("resetRequest");
+}
+
+passBtn.addEventListener("click", passTurn);
+resetBtn.addEventListener("click", resetGame);
+
+// Init UI
+initBoard();

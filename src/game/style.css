@@ -1,0 +1,47 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin: 0;
+  padding: 10px;
+  background: #352f2f9b;
+}
+
+.match-info {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 0 10px;
+}
+
+#board {
+  max-width: 90vmin;
+  margin: auto;
+  aspect-ratio: 1/1;
+  border: 2px solid #333;
+  background: #ffffffb2;
+}
+
+.cell {
+  border: 1px solid #726a6a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: calc(90vmin / 20);
+  line-height: 1;
+  aspect-ratio: 1/1;
+  cursor: pointer;
+  user-select: none;
+}
+.cell.last-x {
+  background-color: rgba(255, 0, 0, 0.3); /* đỏ nhạt */
+}
+
+.cell.last-o {
+  background-color: rgba(255, 255, 0, 0.5); /* vàng nhạt */
+}
+.cell.win-cell {
+  background-color: lightgreen !important;
+}
