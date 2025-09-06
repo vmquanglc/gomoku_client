@@ -10,8 +10,8 @@
     <button id="moveToGame"> move to home</button>
     <script src="./src/config.js"></script>
     <script>
-        document.getElementById('moveToHome').onclick = () => moveToHome();
-        document.getElementById('moveToGame').onclick = () => moveToGame();
+        document.getElementById('moveToHome').onclick = () => goToPage(PAGES_ENUM.HOME);
+        document.getElementById('moveToGame').onclick = () => goToPage(PAGES_ENUM.GAME,'id=5&mode=hard');
     </script>
 </body>
 </html>

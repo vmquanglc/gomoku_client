@@ -1,28 +1,54 @@
-const env = 2;
-
-
+const ENV = 2;
 
 const ENV_ENUM = {
-    LOCAL: 1,
-    GITHUB: 2
+  LOCAL: 1,
+  GITHUB: 2,
+};
+const PAGES_ENUM = {
+    HOME: 'home',
+    GAME: 'game',
+    INDEX: 'index'
 }
-const router  = new Map();
-router.set(ENV_ENUM.LOCAL,{
-    home: `/src/home/index.html`,
-    game: `/src/game/index.html`,
-    index: `/index.html`,
-});
-router.set(ENV_ENUM.GITHUB,{
-    home: `/gomoku_client/src/home/index.html`,
-    game: `/gomoku_client/src/game/index.html`,
-    index: `/index.html`,
-});
-function moveToIndex(){
-    window.location.href = window.location.origin + router.get(env).index; 
+const router = {
+  [PAGES_ENUM.HOME]: `src/home/index.html`,
+  [PAGES_ENUM.GAME]: `src/game/index.html`,
+  [PAGES_ENUM.INDEX]: `index.html`,
 }
-function moveToHome(){
-    window.location.href = window.location.origin + router.get(env).home; 
+function getQueryParams() {
+  const params = {};
+  window.location.search
+    .substring(1)
+    .split("&")
+    .forEach((pair) => {
+      if (pair) {
+        const [key, value] = pair.split("=");
+        params[decodeURIComponent(key)] = decodeURIComponent(value || "");
+      }
+    });
+  return params;
 }
-function moveToGame(){
-    window.location.href = window.location.origin + router.get(env).game; 
+function goToPage(page, query = "") {
+  const path = router[page];
+  if (!path) {
+    throw new Error("Route not found:", page);
+  }
+  const host = window.location.origin;
+  const base = basePathByEnv.get(ENV);
+  let url = host + base + "/" + path;
+  if (query) {
+    url += "?" + query;
+  }
+  window.location.href = url;
 }
+
+function getBasePathLocal(){
+    return "";
+}
+function getBasePathGithub(){
+    const pathParts = window.location.pathname.split("/");
+    return "/" + pathParts[1];
+}
+const basePathByEnv = new Map([
+    [ENV_ENUM.LOCAL , getBasePathLocal()],
+    [ENV_ENUM.GITHUB , getBasePathGithub()]
+]);
