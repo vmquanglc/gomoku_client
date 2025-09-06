@@ -1,85 +1,151 @@
-console.log("home index.js");
-
-
-class CountdownCircle {
-  /**
-   * @param {string} containerSelector - selector của div chứa timer
-   * @param {number} totalTime - tổng thời gian đếm ngược (giây)
-   * @param {function} onComplete - callback khi hết thời gian
-   */
-  constructor(containerSelector, totalTime = 60, onComplete = () => {}) {
-    this.container = document.querySelector(containerSelector);
-    if (!this.container) throw new Error("Container not found");
-
-    this.totalTime = totalTime;
-    this.timeLeft = totalTime;
-    this.onComplete = onComplete;
-
-    this._createSVG();
-    this._updateText();
-  }
-
-  _createSVG() {
-    const size = 100;
-    const radius = 45;
-    this.circumference = 2 * Math.PI * radius;
-
-    // tạo HTML
-    this.container.innerHTML = `
-      <svg width="${size}" height="${size}">
-        <circle cx="${size/2}" cy="${size/2}" r="${radius}" stroke="#ccc" stroke-width="10" fill="none"/>
-        <circle cx="${size/2}" cy="${size/2}" r="${radius}" stroke="green" stroke-width="10" fill="none"
-                stroke-dasharray="${this.circumference}" stroke-dashoffset="0" transform="rotate(-90 ${size/2} ${size/2})"/>
-      </svg>
-      <div class="time-text" style="
-        position:absolute;
-        top:50%;
-        left:50%;
-        transform:translate(-50%, -50%);
-        font-size:24px;
-        font-weight:bold;
-      ">${this.timeLeft}</div>
-    `;
-
-    this.progressCircle = this.container.querySelector("circle:nth-child(2)");
-    this.timeText = this.container.querySelector(".time-text");
-    this.container.style.position = "relative";
-  }
-
-  _updateText() {
-    this.timeText.textContent = this.timeLeft;
-    const offset = this.circumference * (1 - this.timeLeft / this.totalTime);
-    this.progressCircle.style.strokeDashoffset = offset;
-  }
-
-  start() {
-    this.stop(); // dừng nếu đang chạy
-    this.timeLeft = this.totalTime;
-    this._updateText();
-
-    this.interval = setInterval(() => {
-      this.timeLeft--;
-      this._updateText();
-
-      if (this.timeLeft <= 0) {
-        this.stop();
-        this.onComplete();
-      }
-    }, 1000);
-  }
-
-  stop() {
-    if (this.interval) clearInterval(this.interval);
-  }
-
-  reset() {
-    this.stop();
-    this.timeLeft = this.totalTime;
-    this._updateText();
-  }
+// Giả lập API trả về danh sách trận đấu
+function fakeApiCall() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const fakeMatches = [
+        { id: 1, status: "waiting", createdAt: "2025-09-06T10:00:00Z" },
+        { id: 2, status: "ready", createdAt: "2025-09-06T11:00:00Z" },
+        { id: 3, status: "waiting", createdAt: "2025-09-06T12:00:00Z" },
+        { id: 4, status: "ready", createdAt: "2025-09-06T09:00:00Z" },
+      ];
+      resolve(fakeMatches);
+    }, 1500);
+  });
 }
 
-const timer = new CountdownCircle("#timer", 10, () => {
-    alert("Time's up!");
+// Sắp xếp: waiting lên trên, cùng trạng thái -> mới nhất lên trước
+function sortMatches() {
+  state.matches = state.matches.sort((a, b) => {
+    if (a.status === b.status) {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    }
+    return a.status === "waiting" ? -1 : 1;
   });
-  timer.start();
+}
+
+// Render danh sách trận đấu
+function renderMatches() {
+  const matchListEl = document.getElementById("match-list");
+  matchListEl.innerHTML = "";
+
+  state.matches.forEach((match) => {
+    const div = document.createElement("div");
+    div.className = "match-item";
+
+    // Ẩn button nếu trạng thái ready
+    const buttonHtml =
+      match.status === "ready"
+        ? ""
+        : `<button class="play" onclick="joinMatch(${match.id})">Vào chơi</button>`;
+
+    div.innerHTML = `
+      <div>
+        <span><strong>ID:</strong> ${match.id}</span> &nbsp;
+        <span class="status ${match.status}">
+          ${match.status === "ready" ? "Đủ người chơi" : "Chưa đủ người"}
+        </span>
+      </div>
+      ${buttonHtml}
+    `;
+    matchListEl.appendChild(div);
+  });
+}
+
+
+
+// Join match
+function joinMatch(id) {
+  alert("Vào chơi trận đấu ID: " + id);
+}
+
+// Tạo trận đấu mới
+function createMatch() {
+  const newId = state.matches.length ? Math.max(...state.matches.map((m) => m.id)) + 1 : 1;
+  state.matches.push({
+    id: newId,
+    status: "waiting",
+    createdAt: new Date().toISOString(),
+  });
+  sortMatches();
+  renderMatches();
+  // Scroll xuống cuối danh sách
+  document.getElementById("match-list").scrollTop =
+    document.getElementById("match-list").scrollHeight;
+}
+
+// Vào nhanh theo ID
+function quickJoin() {
+  const idInput = document.getElementById("quick-id");
+  const id = parseInt(idInput.value);
+  if (!id || isNaN(id)) {
+    alert("Vui lòng nhập ID hợp lệ");
+    return;
+  }
+
+  const match = state.matches.find((m) => m.id === id);
+  if (!match) {
+    alert("Không tìm thấy trận đấu với ID này");
+    return;
+  }
+
+  if (match.status === "ready") {
+    alert("Trận đấu đã đủ người chơi");
+    return;
+  }
+
+  joinMatch(id);
+}
+const popupConnectingServer = new PopupConnectingServer();
+popupConnectingServer.show();
+
+const state = new Proxy({
+    connectedServer: false,
+    matches: []
+},{
+    set(target, property, value) {
+        switch (property) {
+            case "connectedServer":
+                value ? popupConnectingServer.close() : popupConnectingServer.show();
+                break;
+            default:
+                break;
+        }
+
+        target[property] = value;
+        return true;
+    }
+});
+
+function initSocket(){
+    const socket = io("http://localhost:3000");
+    socket.on("connect", () => {
+  state.connectedServer = true;
+});
+
+// Kết nối thất bại / lỗi
+socket.on("connect_error", (err) => {
+  state.connectedServer = false;
+});
+
+// Kết nối timeout (không phản hồi từ server)
+socket.on("connect_timeout", (timeout) => {
+  state.connectedServer = false;
+});
+}
+// Khởi tạo
+async function init() {
+  // Gọi API
+  state.matches = await fakeApiCall();
+  sortMatches();
+  renderMatches();
+  initSocket();
+
+  // Button Tạo trận đấu
+  document.getElementById("create-game").addEventListener("click", createMatch);
+
+  // Button Vào nhanh
+  document.getElementById("quick-join").addEventListener("click", quickJoin);
+}
+
+// Chạy khi DOM load
+window.addEventListener("DOMContentLoaded", init);

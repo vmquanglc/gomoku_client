@@ -1,14 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Danh sách trận đấu</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <div>home</div>
-    <div id="timer"></div>
-    <script src="./index.js"></script>
+    <div class="container">
+        <h1>Danh sách trận đấu</h1>
+
+        <button id="create-game" class="btn_blue">Tạo trận đấu</button>
+
+        <div class="quick-join">
+            <input type="number" id="quick-id" placeholder="Nhập ID trận">
+            <button id="quick-join">Vào nhanh</button>
+        </div>
+
+        <div class="match-list" id="match-list"></div>
+    </div>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="../popup/popupConnectingServer.js"></script>
+    <script src="index.js"></script>
 </body>
+
 </html>
