@@ -1,4 +1,4 @@
-class PopupWatingOtherPlayer {
+class PopupWaitingOtherPlayer {
   constructor() {}
 
   show() {
@@ -20,7 +20,7 @@ class PopupWatingOtherPlayer {
           min-width: 200px;
           text-align: center;
         ">
-          <p>Đang đợi người chơi khác....</p>
+          <p>Waiting for Opponent....</p>
         </div>
       </div>
     `;

@@ -19,12 +19,38 @@ const playerInfoEl = document.getElementById("playerInfo");
 const timerEl = document.getElementById("timer");
 const passBtn = document.getElementById("passBtn");
 const resetBtn = document.getElementById("resetBtn");
+const popupConnectingServer = new PopupConnectingServer();
+popupConnectingServer.show();
+const popupWaitingOtherPlayer = new PopupWaitingOtherPlayer();
+popupConnectingServer.show();
 
 let mySymbol = null;
 let currentPlayer = null;
 let lastMoves = { X: null, O: null };
 let timer = 60;
 let timerInterval;
+
+const state = new Proxy({
+    connectedServer: false,
+    waitingOtherPlayer: true
+},{
+    set(target, property, value) {
+        
+        switch (property) {
+            case "connectedServer":
+                value ? popupConnectingServer.close() : popupConnectingServer.show();
+                break;
+            case "waitingOtherPlayer":
+                value ? popupWaitingOtherPlayer.show() : popupWaitingOtherPlayer.close();
+                break;
+            default:
+                break;
+        }
+
+        target[property] = value;
+        return true; // must return true to indicate success
+    }
+});
 
 function initBoard() {
   boardEl.innerHTML = "";
@@ -73,6 +99,21 @@ function highlightLastMove(symbol, row, col) {
 }
 
 // Socket events
+// Kết nối thành công
+socket.on("connect", () => {
+  state.connectedServer = true;
+});
+
+// Kết nối thất bại / lỗi
+socket.on("connect_error", (err) => {
+  state.connectedServer = false;
+});
+
+// Kết nối timeout (không phản hồi từ server)
+socket.on("connect_timeout", (timeout) => {
+  state.connectedServer = false;
+});
+
 socket.emit("joinRoom", token);
 
 socket.on("joined", (data) => {
@@ -80,8 +121,8 @@ socket.on("joined", (data) => {
   playerInfoEl.textContent = `You are Player ${mySymbol}`;
 });
 
-socket.on("waiting", (msg) => {
-  statusEl.textContent = msg;
+socket.on("checkWaitingOtherPlayer", ({waiting}) => {
+  state.waitingOtherPlayer = waiting;
 });
 
 socket.on("redirectHome", () => {
@@ -127,6 +168,7 @@ socket.on("gameOver", ({ winner, cells }) => {
 socket.on("opponentLeft", () => {
   statusEl.textContent = "❌ Opponent left. Game ended.";
   clearInterval(timerInterval);
+  state.waitingOtherPlayer = true;
 });
 
 // Gửi nước đi

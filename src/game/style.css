@@ -1,11 +1,4 @@
-body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  margin: 0;
-  padding: 10px;
-  background: #352f2f9b;
-}
-
+@import "../common/style.css";
 .match-info {
   display: flex;
   justify-content: space-evenly;
@@ -21,7 +14,7 @@ body {
   margin: auto;
   aspect-ratio: 1/1;
   border: 2px solid #333;
-  background: #ffffffb2;
+  background: #fffffff0;
 }
 
 .cell {

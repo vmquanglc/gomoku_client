@@ -1,4 +1,4 @@
-class PopupConnectServer {
+class PopupConnectingServer {
   constructor() {}
 
   show() {
