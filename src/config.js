@@ -1,3 +1,3 @@
 class Gomoku_Config {
-  static ENV = 4;
+  static ENV = 2;
 }
