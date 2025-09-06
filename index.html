@@ -6,9 +6,16 @@
     <title>Document</title>
 </head>
 <body>
-    <div>index html</div>
+    <button id="moveToHome"> move to home</button>
+    <button id="moveToGame"> move to home</button>
+    <script src="/config.js"></script>
     <script>
-        window.location.href = "gomoku_client/src/home/index.html"; 
+        document.getElementById('moveToHome').onclick = () =>{
+            window.location.href = window.location.origin + router.get(env).home; 
+        }
+        document.getElementById('moveToGame').onclick = () =>{
+            window.location.href = window.location.origin + router.get(env).game; 
+        }
     </script>
 </body>
 </html>
