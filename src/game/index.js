@@ -1,4 +1,4 @@
-const socket = io("http://localhost:3000");
+const socket = io(Gomoku_Config.SERVER_URL);
 
 function getOrCreateToken() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -20,9 +20,8 @@ const timerEl = document.getElementById("timer");
 const passBtn = document.getElementById("passBtn");
 const resetBtn = document.getElementById("resetBtn");
 const popupConnectingServer = new PopupConnectingServer();
-popupConnectingServer.show();
 const popupWaitingOtherPlayer = new PopupWaitingOtherPlayer();
-popupConnectingServer.show();
+popupWaitingOtherPlayer.show();
 
 let mySymbol = null;
 let currentPlayer = null;
@@ -126,7 +125,7 @@ socket.on("checkWaitingOtherPlayer", ({waiting}) => {
 });
 
 socket.on("redirectHome", () => {
-  window.location.href = "/src/home/index.html";
+  Gomoku_Router.goToPage(Gomoku_Router.PAGES_ENUM.HOME)
 });
 
 // Khi server reset trận đấu

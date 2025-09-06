@@ -1,28 +1,3 @@
-// Giả lập API trả về danh sách trận đấu
-function fakeApiCall() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const fakeMatches = [
-        { id: 1, status: "waiting", createdAt: "2025-09-06T10:00:00Z" },
-        { id: 2, status: "ready", createdAt: "2025-09-06T11:00:00Z" },
-        { id: 3, status: "waiting", createdAt: "2025-09-06T12:00:00Z" },
-        { id: 4, status: "ready", createdAt: "2025-09-06T09:00:00Z" },
-      ];
-      resolve(fakeMatches);
-    }, 1500);
-  });
-}
-
-// Sắp xếp: waiting lên trên, cùng trạng thái -> mới nhất lên trước
-function sortMatches() {
-  state.matches = state.matches.sort((a, b) => {
-    if (a.status === b.status) {
-      return new Date(b.createdAt) - new Date(a.createdAt);
-    }
-    return a.status === "waiting" ? -1 : 1;
-  });
-}
-
 // Render danh sách trận đấu
 function renderMatches() {
   const matchListEl = document.getElementById("match-list");
@@ -34,15 +9,15 @@ function renderMatches() {
 
     // Ẩn button nếu trạng thái ready
     const buttonHtml =
-      match.status === "ready"
+      match.status
         ? ""
-        : `<button class="play" onclick="joinMatch(${match.id})">Vào chơi</button>`;
+        : `<button class="play" onclick="joinMatch(${match.id})">Play</button>`;
 
     div.innerHTML = `
       <div>
         <span><strong>ID:</strong> ${match.id}</span> &nbsp;
-        <span class="status ${match.status}">
-          ${match.status === "ready" ? "Đủ người chơi" : "Chưa đủ người"}
+        <span class="status ${match.status? 'waiting' : 'ready'}">
+          ${match.status ? "Full" : "Ready to play"}
         </span>
       </div>
       ${buttonHtml}
@@ -51,97 +26,95 @@ function renderMatches() {
   });
 }
 
-
-
 // Join match
 function joinMatch(id) {
-  alert("Vào chơi trận đấu ID: " + id);
+  Gomoku_Router.goToPage(
+    Gomoku_Router.PAGES_ENUM.GAME,
+    id ? `token=${id}` : ""
+  );
 }
 
-// Tạo trận đấu mới
-function createMatch() {
-  const newId = state.matches.length ? Math.max(...state.matches.map((m) => m.id)) + 1 : 1;
-  state.matches.push({
-    id: newId,
-    status: "waiting",
-    createdAt: new Date().toISOString(),
-  });
-  sortMatches();
-  renderMatches();
-  // Scroll xuống cuối danh sách
-  document.getElementById("match-list").scrollTop =
-    document.getElementById("match-list").scrollHeight;
+function isValidUrl(str) {
+  try {
+    new URL(str);
+    return true;
+  } catch {
+    return false;
+  }
 }
-
 // Vào nhanh theo ID
 function quickJoin() {
-  const idInput = document.getElementById("quick-id");
-  const id = parseInt(idInput.value);
-  if (!id || isNaN(id)) {
-    alert("Vui lòng nhập ID hợp lệ");
+  debugger;
+  const _value = document.getElementById("quick-id").value;
+  const [isUrl, isNumber] = [isValidUrl(_value), Number(_value) != NaN];
+  if (!isUrl && !isNumber) {
+    alert("Giá trị không hợp lệ!");
+  }
+  if (isUrl) {
+    window.location.href = _value;
     return;
   }
-
-  const match = state.matches.find((m) => m.id === id);
-  if (!match) {
-    alert("Không tìm thấy trận đấu với ID này");
+  if (isNumber) {
+    joinMatch(encodeURIComponent(_value));
     return;
   }
-
-  if (match.status === "ready") {
-    alert("Trận đấu đã đủ người chơi");
-    return;
-  }
-
-  joinMatch(id);
 }
 const popupConnectingServer = new PopupConnectingServer();
-popupConnectingServer.show();
 
-const state = new Proxy({
+const state = new Proxy(
+  {
     connectedServer: false,
-    matches: []
-},{
+    matches: [],
+  },
+  {
     set(target, property, value) {
-        switch (property) {
-            case "connectedServer":
-                value ? popupConnectingServer.close() : popupConnectingServer.show();
-                break;
-            default:
-                break;
-        }
+      switch (property) {
+        case "connectedServer":
+          value ? popupConnectingServer.close() : popupConnectingServer.show();
+          break;
+        default:
+          break;
+      }
 
-        target[property] = value;
-        return true;
-    }
-});
+      target[property] = value;
+      return true;
+    },
+  }
+);
 
-function initSocket(){
-    const socket = io("http://localhost:3000");
-    socket.on("connect", () => {
-  state.connectedServer = true;
-});
+function initSocket() {
+  const socket = io(Gomoku_Config.SERVER_URL, {
+    query: { page: Gomoku_Router.PAGES_ENUM.HOME },
+  });
+  socket.on("connect", () => {
+    state.connectedServer = true;
+  });
 
-// Kết nối thất bại / lỗi
-socket.on("connect_error", (err) => {
-  state.connectedServer = false;
-});
+  // Kết nối thất bại / lỗi
+  socket.on("connect_error", (err) => {
+    state.connectedServer = false;
+  });
 
-// Kết nối timeout (không phản hồi từ server)
-socket.on("connect_timeout", (timeout) => {
-  state.connectedServer = false;
-});
+  // Kết nối timeout (không phản hồi từ server)
+  socket.on("connect_timeout", (timeout) => {
+    state.connectedServer = false;
+  });
+
+  // Lắng nghe danh sách rooms từ server
+  socket.on("roomsUpdate", (rooms) => {
+      state.matches = rooms?.map(_ => _) ?? [];
+      renderMatches();
+  });
 }
 // Khởi tạo
 async function init() {
-  // Gọi API
-  state.matches = await fakeApiCall();
-  sortMatches();
   renderMatches();
   initSocket();
 
   // Button Tạo trận đấu
-  document.getElementById("create-game").addEventListener("click", createMatch);
+  document
+    .getElementById("create-game")
+    .addEventListener("click", () => joinMatch());
 
   // Button Vào nhanh
   document.getElementById("quick-join").addEventListener("click", quickJoin);
