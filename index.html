@@ -8,14 +8,10 @@
 <body>
     <button id="moveToHome"> move to home</button>
     <button id="moveToGame"> move to home</button>
-    <script src="/config.js"></script>
+    <script src="./src/config.js"></script>
     <script>
-        document.getElementById('moveToHome').onclick = () =>{
-            window.location.href = window.location.origin + router.get(env).home; 
-        }
-        document.getElementById('moveToGame').onclick = () =>{
-            window.location.href = window.location.origin + router.get(env).game; 
-        }
+        document.getElementById('moveToHome').onclick = () => moveToHome();
+        document.getElementById('moveToGame').onclick = () => moveToGame();
     </script>
 </body>
 </html>
