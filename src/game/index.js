@@ -19,8 +19,12 @@ const playerInfoEl = document.getElementById("playerInfo");
 const timerEl = document.getElementById("timer");
 const passBtn = document.getElementById("passBtn");
 const resetBtn = document.getElementById("resetBtn");
-const popupConnectingServer = new PopupConnectingServer();
-const popupWaitingOtherPlayer = new PopupWaitingOtherPlayer();
+const popupConnectingServer = new PopupShowInformation({
+  message: Gomoku_i18n.ConnectingToServer,
+});
+const popupWaitingOtherPlayer = new PopupShowInformation({
+  message: Gomoku_i18n.WaitingForOpponent,
+});
 popupWaitingOtherPlayer.show();
 
 let mySymbol = null;
