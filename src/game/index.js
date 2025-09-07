@@ -86,10 +86,10 @@ function initBoard() {
 function resetTimer() {
   clearInterval(timerInterval);
   timer = 60;
-  timerEl.textContent = `⏳ ${timer}`;
+  timerEl.textContent = `${timer}`;
   timerInterval = setInterval(() => {
     timer--;
-    timerEl.textContent = `⏳ ${timer}`;
+    timerEl.textContent = `${timer}`;
     if (timer <= 0) {
       clearInterval(timerInterval);
       passTurn();
@@ -134,7 +134,7 @@ socket.emit("joinRoom", token);
 
 socket.on("joined", (data) => {
   mySymbol = data.symbol;
-  playerInfoEl.textContent = `You are Player ${mySymbol}`;
+  playerInfoEl.textContent = `You ${mySymbol}`;
 });
 
 socket.on("checkWaitingOtherPlayer", ({ waiting }) => {

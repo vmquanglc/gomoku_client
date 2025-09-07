@@ -7,15 +7,20 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="match-info">
-    <div id="playerInfo"></div>
-    <div id="status"></div>
-    <div id="timer">⏳</div>
-  </div>
-
-  <div class="controls">
-    <button id="passBtn">Pass</button>
-    <button id="resetBtn">Reset</button>
+  <div class="header">
+    <div class="match-info">
+      <div id="playerInfo"></div>
+      <div class="turnInfor">
+        <div id="status"></div>
+        <div> - </div>
+        <div class="blink" id="timer"></div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn-blue" id="backToHome">Home</button>
+      <button class="btn-blue" id="resetBtn">Reset game</button>
+      <button class="btn-blue" id="passBtn">Pass turn</button>
+    </div>
   </div>
 
   <div id="board"></div>

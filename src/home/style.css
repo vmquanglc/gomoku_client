@@ -1,95 +1,93 @@
 @import "../common/style.css";
 /* Container chính */
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
 
-        /* Tiêu đề */
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+/* Tiêu đề */
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
 
-        #create-game{
-            margin-bottom: 8px;
-        }
+#create-game {
+  margin-bottom: 8px;
+}
 
-        /* Nhóm input + button "Vào nhanh" */
-        .quick-join {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            /* khoảng cách với danh sách trận */
-        }
+/* Nhóm input + button "Vào nhanh" */
+.quick-join {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  /* khoảng cách với danh sách trận */
+}
 
-        .quick-join input {
-            padding: 7px 10px;
-            width: 100px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 14px;
-        }
+.quick-join input {
+  padding: 7px 10px;
+  width: 100px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
 
-        
+/* Danh sách trận đấu */
+.match-list {
+  max-height: 500px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: white;
+  padding: 10px;
+}
 
-        /* Danh sách trận đấu */
-        .match-list {
-            max-height: 500px;
-            overflow-y: auto;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: white;
-            padding: 10px;
-        }
+/* Một trận đấu */
+.match-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
 
-        /* Một trận đấu */
-        .match-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
+.match-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
 
-        .match-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-        }
+/* Trạng thái */
+.status {
+  font-weight: bold;
+}
 
-        /* Trạng thái */
-        .status {
-            font-weight: bold;
-        }
+.status.ready {
+  color: green;
+}
 
-        .status.ready {
-            color: green;
-        }
+.status.waiting {
+  color: orange;
+}
 
-        .status.waiting {
-            color: orange;
-        }
+/* Responsive cho mobile */
+@media (max-width: 600px) {
+  .quick-join {
+    flex-direction: column;
+    gap: 5px;
+  }
 
-        /* Responsive cho mobile */
-        @media (max-width: 600px) {
-            .quick-join {
-                flex-direction: column;
-                gap: 5px;
-            }
+  .quick-join input,
+  .quick-join button {
+    width: 100%;
+  }
 
-            .quick-join input,
-            .quick-join button {
-                width: 100%;
-            }
-
-            /* Giữ button Vào chơi cùng hàng với thông tin trận đấu */
-            .match-item {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-            }
-        }
+  /* Giữ button Vào chơi cùng hàng với thông tin trận đấu */
+  .match-item {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}

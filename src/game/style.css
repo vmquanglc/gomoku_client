@@ -1,4 +1,7 @@
 @import "../common/style.css";
+.header {
+  padding-bottom: 4px;
+}
 .match-info {
   display: flex;
   justify-content: space-evenly;
@@ -7,6 +10,12 @@
   font-size: 18px;
   font-weight: bold;
   padding: 0 10px;
+}
+.turnInfor {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
 }
 
 #board {
@@ -37,4 +46,7 @@
 }
 .cell.win-cell {
   background-color: lightgreen !important;
+}
+#timer{
+  color: rgba(255, 0, 0, 0.699);
 }

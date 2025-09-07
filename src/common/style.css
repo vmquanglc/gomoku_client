@@ -2,7 +2,7 @@ body {
   font-family: Arial, sans-serif;
   text-align: center;
   margin: 0;
-  padding: 10px;
+  padding: 8px;
   background: #352f2f9b;
 }
 /* Button tạo trận đấu */
@@ -19,4 +19,12 @@ body {
 
 .btn-blue:hover {
   background-color: #0056b3;
+}
+.blink {
+  animation: blink-animation 1s steps(2, start) infinite;
+}
+
+@keyframes blink-animation {
+  0%, 100% { visibility: visible; }
+  50% { visibility: hidden; }
 }
