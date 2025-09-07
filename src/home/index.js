@@ -1,3 +1,35 @@
+const state = new Proxy(
+  {
+    connectedServer: false,
+    matches: [],
+  },
+  {
+    set(target, property, value) {
+      switch (property) {
+        case "connectedServer":
+          value ? popupConnectingServer.close() : popupConnectingServer.show();
+          break;
+        default:
+          break;
+      }
+
+      target[property] = value;
+      return true;
+    },
+  }
+);
+const popupConnectingServer = new PopupShowInformation({
+  message: Gomoku_i18n.ConnectingToServer,
+});
+
+const mappingStatusName = new Map([
+  [Gomoku_Constant.RoomStatus.Full, "Full"],
+  [Gomoku_Constant.RoomStatus.ReadyToPlay, "Ready to play"],
+]);
+const mappingStatusClassName = new Map([
+  [Gomoku_Constant.RoomStatus.Full, "waiting"],
+  [Gomoku_Constant.RoomStatus.ReadyToPlay, "ready"],
+]);
 // Render danh sách trận đấu
 function renderMatches() {
   const matchListEl = document.getElementById("match-list");
@@ -6,17 +38,17 @@ function renderMatches() {
   state.matches.forEach((match) => {
     const div = document.createElement("div");
     div.className = "match-item";
-
     // Ẩn button nếu trạng thái ready
-    const buttonHtml = match.status
-      ? ""
-      : `<button class="play" onclick="joinMatch(${match.id})">Play</button>`;
+    const buttonHtml =
+      match.status === Gomoku_Constant.RoomStatus.Full
+        ? ""
+        : `<button class="play" onclick="joinMatch(${match.id})">Play</button>`;
 
     div.innerHTML = `
       <div>
         <span><strong>ID:</strong> ${match.id}</span> &nbsp;
-        <span class="status ${match.status ? "waiting" : "ready"}">
-          ${match.status ? "Full" : "Ready to play"}
+        <span class="status ${mappingStatusClassName.get(match.status) ?? ""}">
+          ${mappingStatusName.get(match.status) ?? ""}
         </span>
       </div>
       ${buttonHtml}
@@ -47,7 +79,8 @@ function quickJoin() {
   const _value = document.getElementById("quick-id").value;
   const [isUrl, isNumber] = [isValidUrl(_value), Number(_value) != NaN];
   if (!isUrl && !isNumber) {
-    alert("Giá trị không hợp lệ!");
+    console.log("url invalid");
+    return;
   }
   if (isUrl) {
     window.location.href = _value;
@@ -58,30 +91,6 @@ function quickJoin() {
     return;
   }
 }
-const popupConnectingServer = new PopupShowInformation({
-  message: "Connecting to server...",
-});
-
-const state = new Proxy(
-  {
-    connectedServer: false,
-    matches: [],
-  },
-  {
-    set(target, property, value) {
-      switch (property) {
-        case "connectedServer":
-          value ? popupConnectingServer.close() : popupConnectingServer.show();
-          break;
-        default:
-          break;
-      }
-
-      target[property] = value;
-      return true;
-    },
-  }
-);
 
 function initSocket() {
   const socket = io(Gomoku_Config.SERVER_URL, {

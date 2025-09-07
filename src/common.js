@@ -1,3 +1,7 @@
+class Gomoku_i18n {
+  static WaitingForOpponent = `Waiting for Opponent....`;
+  static ConnectingToServer = "Connecting to server..."
+}
 class Gomoku_Constant {
   static PAGES = {
     HOME: "home",
@@ -7,6 +11,10 @@ class Gomoku_Constant {
   static ENV = {
     Local: 1,
     Github: 2,
+  };
+  static RoomStatus = {
+    Full: 2,
+    ReadyToPlay: 3
   };
 }
 class Gomoku_Router {

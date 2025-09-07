@@ -20,7 +20,7 @@ class PopupWaitingOtherPlayer {
           min-width: 200px;
           text-align: center;
         ">
-          <p>Waiting for Opponent....</p>
+          <p>${Gomoku_i18n.WaitingForOpponent}</p>
         </div>
       </div>
     `;
