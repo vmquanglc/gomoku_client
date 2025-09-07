@@ -12,10 +12,6 @@ class Gomoku_Constant {
     GAME: "game",
     INDEX: "index",
   };
-  static ENV = {
-    Local: 1,
-    Github: 2,
-  };
   static RoomStatus = {
     Full: 2,
     ReadyToPlay: 3
@@ -46,7 +42,8 @@ class Gomoku_Router {
       throw new Error("Route not found:", page);
     }
     const host = window.location.origin;
-    const base = Gomoku_Router.basePathByEnv.get(Gomoku_Config.ENV);
+    const base = Gomoku_Router.getBasePath();
+    debugger
     let url = host + base + "/" + path;
     if (query) {
       url += "?" + query;
@@ -57,16 +54,11 @@ class Gomoku_Router {
     }
     window.location.href = url;
   }
-
-  static getBasePathLocal() {
+  static getBasePath() {
+    const pathParts = window.location.pathname.split("/");
+    if(window.location.hostname.includes('github')){
+      return "/" + pathParts[1];
+    }
     return "";
   }
-  static getBasePathGithub() {
-    const pathParts = window.location.pathname.split("/");
-    return "/" + pathParts[1];
-  }
-  static basePathByEnv = new Map([
-    [Gomoku_Constant.ENV.Local, Gomoku_Router.getBasePathLocal()],
-    [Gomoku_Constant.ENV.Github, Gomoku_Router.getBasePathGithub()],
-  ]);
 }
