@@ -19,6 +19,11 @@ const playerInfoEl = document.getElementById("playerInfo");
 const timerEl = document.getElementById("timer");
 const passBtn = document.getElementById("passBtn");
 const resetBtn = document.getElementById("resetBtn");
+document
+  .getElementById("backToHome")
+  .addEventListener("click", () =>
+    Gomoku_Router.goToPage({ page: Gomoku_Constant.PAGES.HOME })
+  );
 const popupConnectingServer = new PopupShowInformation({
   message: Gomoku_i18n.ConnectingToServer,
 });
@@ -31,7 +36,7 @@ const popupShowOpponentPassTurn = new PopupShowInformation(
   {
     message: Gomoku_i18n.OpponentPassTurn,
   },
-  { timeout: 2000}
+  { timeout: 2000 }
 );
 
 let mySymbol = null;
@@ -192,7 +197,7 @@ socket.on("opponentLeft", () => {
 });
 
 socket.on("passTurn", ({}) => {
-  popupShowOpponentPassTurn.show()
+  popupShowOpponentPassTurn.show();
 });
 
 // Gửi nước đi
@@ -209,7 +214,7 @@ function makeMove(row, col) {
 // Bỏ lượt
 function passTurn() {
   if (currentPlayer === mySymbol) {
-    socket.emit("passTurn");
+    boardEl.dataset.gameOver !== "true" && socket.emit("passTurn");
   }
 }
 
