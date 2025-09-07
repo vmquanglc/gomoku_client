@@ -39,6 +39,26 @@ const popupShowOpponentPassTurn = new PopupShowInformation(
   { timeout: 2000 }
 );
 
+const popupWaitingResetRequest = new PopupShowInformation(
+  {
+    message: Gomoku_i18n.WaitingResetRequest,
+  },
+  { timeout: 2000 }
+);
+
+const popupYesNoResetRequest = new PopupYesNo(
+  {
+    message: Gomoku_i18n.AskToRestart,
+  },
+  {
+    yesCallBack: () => {
+      resetGame(true);
+      popupYesNoResetRequest.close();
+    },
+    timeout: 3000,
+  }
+);
+
 let mySymbol = null;
 let currentPlayer = null;
 let lastMoves = { X: null, O: null };
@@ -200,6 +220,14 @@ socket.on("passTurn", ({}) => {
   popupShowOpponentPassTurn.show();
 });
 
+socket.on("waitingResetResponse", ({}) => {
+  popupWaitingResetRequest.show();
+});
+
+socket.on("confirmResetRequest", ({}) => {
+  popupYesNoResetRequest.show();
+});
+
 // Gửi nước đi
 function makeMove(row, col) {
   if (boardEl.dataset.gameOver === "true") return; // khóa bàn
@@ -219,12 +247,13 @@ function passTurn() {
 }
 
 // Reset game
-function resetGame() {
-  socket.emit("resetRequest");
+function resetGame(yes) {
+  debugger;
+  socket.emit("resetRequest", { confirmReset: !!yes });
 }
 
 passBtn.addEventListener("click", passTurn);
-resetBtn.addEventListener("click", resetGame);
+resetBtn.addEventListener("click", () => resetGame(false));
 
 // Init UI
 initBoard();

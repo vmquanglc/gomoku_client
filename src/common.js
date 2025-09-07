@@ -2,6 +2,7 @@ class Gomoku_i18n {
   static WaitingForOpponent = `Waiting for Opponent....`;
   static ConnectingToServer = "Connecting to server...";
   static OpponentPassTurn = "The Opponent has passed turn, your turn now.";
+  static WaitingResetRequest = "Waiting for opponent reset Response";
   static AskToRestart = "The Opponent want to restart the game?";
   static ResponseToNoRestart = "The Opponent has rejected your restart request";
 }
