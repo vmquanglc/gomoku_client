@@ -22,6 +22,7 @@ const popupConnectingServer = new PopupShowInformation({
   message: Gomoku_i18n.ConnectingToServer,
 });
 
+
 const mappingStatusName = new Map([
   [Gomoku_Constant.RoomStatus.Full, "Full"],
   [Gomoku_Constant.RoomStatus.ReadyToPlay, "Ready to play"],
@@ -42,7 +43,7 @@ function renderMatches() {
     const buttonHtml =
       match.status === Gomoku_Constant.RoomStatus.Full
         ? ""
-        : `<button class="play" onclick="joinMatch(${match.id})">Play</button>`;
+        : `<button class="btn-blue" onclick="joinMatch(${match.id})">Play</button>`;
 
     div.innerHTML = `
       <div>

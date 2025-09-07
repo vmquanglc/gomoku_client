@@ -27,6 +27,13 @@ const popupWaitingOtherPlayer = new PopupShowInformation({
 });
 popupWaitingOtherPlayer.show();
 
+const popupShowOpponentPassTurn = new PopupShowInformation(
+  {
+    message: Gomoku_i18n.OpponentPassTurn,
+  },
+  { timeout: 2000}
+);
+
 let mySymbol = null;
 let currentPlayer = null;
 let lastMoves = { X: null, O: null };
@@ -182,6 +189,10 @@ socket.on("opponentLeft", () => {
   statusEl.textContent = "❌ Opponent left. Game ended.";
   clearInterval(timerInterval);
   state.waitingOtherPlayer = true;
+});
+
+socket.on("passTurn", ({}) => {
+  popupShowOpponentPassTurn.show()
 });
 
 // Gửi nước đi

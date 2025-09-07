@@ -6,7 +6,7 @@ body {
   background: #352f2f9b;
 }
 /* Button tạo trận đấu */
-.btn_blue {
+.btn-blue {
   padding: 8px 16px;
   font-size: 16px;
   border: none;
@@ -17,6 +17,6 @@ body {
   transition: background-color 0.3s;
 }
 
-.btn_blue:hover {
+.btn-blue:hover {
   background-color: #0056b3;
 }

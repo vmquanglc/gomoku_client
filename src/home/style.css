@@ -34,20 +34,7 @@
             font-size: 14px;
         }
 
-        .quick-join button {
-            padding: 7px 15px;
-            border: none;
-            border-radius: 5px;
-            background-color: #28a745;
-            color: white;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s;
-        }
-
-        .quick-join button:hover {
-            background-color: #1e7e34;
-        }
+        
 
         /* Danh sách trận đấu */
         .match-list {
@@ -85,21 +72,6 @@
 
         .status.waiting {
             color: orange;
-        }
-
-        /* Button Vào chơi */
-        button.play {
-            padding: 5px 15px;
-            border: none;
-            border-radius: 5px;
-            background-color: #17a2b8;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        button.play:hover {
-            background-color: #117a8b;
         }
 
         /* Responsive cho mobile */

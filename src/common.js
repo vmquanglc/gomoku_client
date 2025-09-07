@@ -1,6 +1,9 @@
 class Gomoku_i18n {
   static WaitingForOpponent = `Waiting for Opponent....`;
-  static ConnectingToServer = "Connecting to server..."
+  static ConnectingToServer = "Connecting to server...";
+  static OpponentPassTurn = "The Opponent has passed turn, your turn now.";
+  static AskToRestart = "The Opponent want to restart the game?";
+  static ResponseToNoRestart = "The Opponent has rejected your restart request";
 }
 class Gomoku_Constant {
   static PAGES = {
