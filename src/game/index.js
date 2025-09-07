@@ -29,27 +29,31 @@ let lastMoves = { X: null, O: null };
 let timer = 60;
 let timerInterval;
 
-const state = new Proxy({
+const state = new Proxy(
+  {
     connectedServer: false,
-    waitingOtherPlayer: true
-},{
+    waitingOtherPlayer: true,
+  },
+  {
     set(target, property, value) {
-        
-        switch (property) {
-            case "connectedServer":
-                value ? popupConnectingServer.close() : popupConnectingServer.show();
-                break;
-            case "waitingOtherPlayer":
-                value ? popupWaitingOtherPlayer.show() : popupWaitingOtherPlayer.close();
-                break;
-            default:
-                break;
-        }
+      switch (property) {
+        case "connectedServer":
+          value ? popupConnectingServer.close() : popupConnectingServer.show();
+          break;
+        case "waitingOtherPlayer":
+          value
+            ? popupWaitingOtherPlayer.show()
+            : popupWaitingOtherPlayer.close();
+          break;
+        default:
+          break;
+      }
 
-        target[property] = value;
-        return true; // must return true to indicate success
-    }
-});
+      target[property] = value;
+      return true; // must return true to indicate success
+    },
+  }
+);
 
 function initBoard() {
   boardEl.innerHTML = "";
@@ -90,7 +94,9 @@ function highlightLastMove(symbol, row, col) {
     );
     if (prev) prev.classList.remove("last-x", "last-o");
   }
-  const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+  const cell = document.querySelector(
+    `.cell[data-row="${row}"][data-col="${col}"]`
+  );
   if (cell) {
     cell.classList.add(symbol === "X" ? "last-x" : "last-o");
     lastMoves[symbol] = { row, col };
@@ -120,12 +126,12 @@ socket.on("joined", (data) => {
   playerInfoEl.textContent = `You are Player ${mySymbol}`;
 });
 
-socket.on("checkWaitingOtherPlayer", ({waiting}) => {
+socket.on("checkWaitingOtherPlayer", ({ waiting }) => {
   state.waitingOtherPlayer = waiting;
 });
 
 socket.on("redirectHome", () => {
-  Gomoku_Router.goToPage(Gomoku_Router.PAGES_ENUM.HOME)
+  Gomoku_Router.goToPage({ page: Gomoku_Constant.PAGES.HOME });
 });
 
 // Khi server reset trận đấu
@@ -140,7 +146,9 @@ socket.on("resetGame", ({ currentPlayer: cp }) => {
 
 // Khi có nước đi mới
 socket.on("updateBoard", ({ row, col, symbol, currentPlayer: cp }) => {
-  const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+  const cell = document.querySelector(
+    `.cell[data-row="${row}"][data-col="${col}"]`
+  );
   if (cell) cell.textContent = symbol;
 
   highlightLastMove(symbol, row, col);
@@ -155,7 +163,9 @@ socket.on("gameOver", ({ winner, cells }) => {
 
   // highlight ô thắng
   cells.forEach(({ row, col }) => {
-    const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+    const cell = document.querySelector(
+      `.cell[data-row="${row}"][data-col="${col}"]`
+    );
     if (cell) cell.classList.add("win-cell");
   });
 
@@ -174,7 +184,9 @@ socket.on("opponentLeft", () => {
 function makeMove(row, col) {
   if (boardEl.dataset.gameOver === "true") return; // khóa bàn
   if (currentPlayer !== mySymbol) return;
-  const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+  const cell = document.querySelector(
+    `.cell[data-row="${row}"][data-col="${col}"]`
+  );
   if (cell.textContent) return;
   socket.emit("makeMove", { row, col });
 }

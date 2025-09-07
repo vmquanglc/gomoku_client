@@ -8,15 +8,14 @@ function renderMatches() {
     div.className = "match-item";
 
     // Ẩn button nếu trạng thái ready
-    const buttonHtml =
-      match.status
-        ? ""
-        : `<button class="play" onclick="joinMatch(${match.id})">Play</button>`;
+    const buttonHtml = match.status
+      ? ""
+      : `<button class="play" onclick="joinMatch(${match.id})">Play</button>`;
 
     div.innerHTML = `
       <div>
         <span><strong>ID:</strong> ${match.id}</span> &nbsp;
-        <span class="status ${match.status? 'waiting' : 'ready'}">
+        <span class="status ${match.status ? "waiting" : "ready"}">
           ${match.status ? "Full" : "Ready to play"}
         </span>
       </div>
@@ -28,10 +27,11 @@ function renderMatches() {
 
 // Join match
 function joinMatch(id) {
-  Gomoku_Router.goToPage(
-    Gomoku_Router.PAGES_ENUM.GAME,
-    id ? `token=${id}` : ""
-  );
+  Gomoku_Router.goToPage({
+    page: Gomoku_Constant.PAGES.GAME,
+    query: id ? `token=${id}` : "",
+    newTab: true,
+  });
 }
 
 function isValidUrl(str) {
@@ -44,7 +44,6 @@ function isValidUrl(str) {
 }
 // Vào nhanh theo ID
 function quickJoin() {
-  debugger;
   const _value = document.getElementById("quick-id").value;
   const [isUrl, isNumber] = [isValidUrl(_value), Number(_value) != NaN];
   if (!isUrl && !isNumber) {
@@ -59,7 +58,9 @@ function quickJoin() {
     return;
   }
 }
-const popupConnectingServer = new PopupConnectingServer();
+const popupConnectingServer = new PopupShowInformation({
+  message: "Connecting to server...",
+});
 
 const state = new Proxy(
   {
@@ -84,7 +85,7 @@ const state = new Proxy(
 
 function initSocket() {
   const socket = io(Gomoku_Config.SERVER_URL, {
-    query: { page: Gomoku_Router.PAGES_ENUM.HOME },
+    query: { page: Gomoku_Constant.PAGES.HOME },
   });
   socket.on("connect", () => {
     state.connectedServer = true;
@@ -102,8 +103,8 @@ function initSocket() {
 
   // Lắng nghe danh sách rooms từ server
   socket.on("roomsUpdate", (rooms) => {
-      state.matches = rooms?.map(_ => _) ?? [];
-      renderMatches();
+    state.matches = rooms?.map((_) => _) ?? [];
+    renderMatches();
   });
 }
 // Khởi tạo

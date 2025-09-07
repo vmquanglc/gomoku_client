@@ -1,17 +1,19 @@
-class Gomoku_Router {
-  static ENV_ENUM = {
-    LOCAL: 1,
-    GITHUB: 2,
-  };
-  static PAGES_ENUM = {
+class Gomoku_Constant {
+  static PAGES = {
     HOME: "home",
     GAME: "game",
     INDEX: "index",
   };
+  static ENV = {
+    Local: 1,
+    Github: 2,
+  };
+}
+class Gomoku_Router {
   static router = {
-    [Gomoku_Router.PAGES_ENUM.HOME]: `src/home/index.html`,
-    [Gomoku_Router.PAGES_ENUM.GAME]: `src/game/index.html`,
-    [Gomoku_Router.PAGES_ENUM.INDEX]: `index.html`,
+    [Gomoku_Constant.PAGES.HOME]: `src/home/index.html`,
+    [Gomoku_Constant.PAGES.GAME]: `src/game/index.html`,
+    [Gomoku_Constant.PAGES.INDEX]: `index.html`,
   };
   static getQueryParams() {
     const params = {};
@@ -26,7 +28,7 @@ class Gomoku_Router {
       });
     return params;
   }
-  static goToPage(page, query = "") {
+  static goToPage({ page, query = "", newTab = false }) {
     const path = Gomoku_Router.router[page];
     if (!path) {
       throw new Error("Route not found:", page);
@@ -36,6 +38,10 @@ class Gomoku_Router {
     let url = host + base + "/" + path;
     if (query) {
       url += "?" + query;
+    }
+    if (newTab) {
+      window.open(url, "_blank", "noopener,noreferrer");
+      return;
     }
     window.location.href = url;
   }
@@ -48,7 +54,7 @@ class Gomoku_Router {
     return "/" + pathParts[1];
   }
   static basePathByEnv = new Map([
-    [Gomoku_Router.ENV_ENUM.LOCAL, Gomoku_Router.getBasePathLocal()],
-    [Gomoku_Router.ENV_ENUM.GITHUB, Gomoku_Router.getBasePathGithub()],
+    [Gomoku_Constant.ENV.Local, Gomoku_Router.getBasePathLocal()],
+    [Gomoku_Constant.ENV.Github, Gomoku_Router.getBasePathGithub()],
   ]);
 }

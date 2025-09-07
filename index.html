@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+
 <body>
-    <button id="moveToHome"> move to home</button>
-    <button id="moveToGame"> move to home</button>
     <script src="./src/config.js"></script>
-    <script src="./src/router.js"></script>
+    <script src="./src/common.js"></script>
     <script>
-        document.getElementById('moveToHome').onclick = () => Gomoku_Router.goToPage(Gomoku_Router.PAGES_ENUM.HOME);
-        document.getElementById('moveToGame').onclick = () => Gomoku_Router.goToPage(Gomoku_Router.PAGES_ENUM.GAME);
+        Gomoku_Router.goToPage({ page: Gomoku_Router.PAGES_ENUM.HOME });
     </script>
 </body>
+
 </html>
